@@ -1,0 +1,24 @@
+{
+  "name": "atlas-admin-api-serviceaccount-auth",
+  "version": "1.0.0",
+  "description": "This repository demonstrates how to call the [MongoDB Atlas Administration API](https://www.mongodb.com/docs/atlas/api/) using Service Account authentication. You can read the accompanying article ['Calling the MongoDB Atlas Admin API - How to do it from Node, Python, and Golang'](https://www.mongodb.com/developer/how-to/nodejs-python-ruby-atlas-api/) for more information.",
+  "main": "index.js",
+  "scripts": {
+    "ai-context": "repomix",
+    "ai-openapi": "wget https://raw.githubusercontent.com/mongodb/openapi/refs/heads/main/openapi/v2/openapi-2025-02-19.yaml",
+    "ai-changelog": "wget https://github.com/mongodb/openapi/blob/main/changelog/version-diff/2024-11-13_2025-02-19.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mongodb-developer/atlas-admin-api-serviceaccount-auth.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mongodb-developer/atlas-admin-api-serviceaccount-auth/issues"
+  },
+  "homepage": "https://github.com/mongodb-developer/atlas-admin-api-serviceaccount-auth#readme",
+  "dependencies": {
+    "repomix": "^0.2.28"
+  }
+}
