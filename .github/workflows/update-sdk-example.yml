@@ -1,0 +1,67 @@
+name: Update SDK Example
+
+on:
+  push:
+    branches: 
+      - copilot
+    paths:
+      - 'context/changelog.json'
+      - '.github/workflows/update-sdk-example.yml'
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-example:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: update-example Update SDK example
+        run: |
+          // call chat.js to update the SDK example
+          npm run chat
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Format code
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          goimports -w golang/sdk-example.go
+
+      - name: Create Pull Request
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          BRANCH_NAME="automated-sdk-example-update-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+
+          if ! git diff --quiet; then
+            git add golang/sdk-example.go
+            git commit -m "chore: Update SDK example based on changelog changes
+            
+            Automated update by GitHub Copilot based on changelog.json changes"
+            git push origin $BRANCH_NAME
+
+            gh pr create \
+              --title "chore: Update SDK example based on changelog changes" \
+              --body "This PR was automatically created using GitHub Copilot to update the SDK example based on changelog.json changes." \
+              --base main \
+              --head $BRANCH_NAME
+          else
+            echo "No changes to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Handle Failure
+        if: failure()
+        run: |
+          echo "::error::Failed to update SDK example. Please check the logs for details."
