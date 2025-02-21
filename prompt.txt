@@ -1,0 +1,5 @@
+Context: openapi.yaml file represents MongoDB Atlas OpenAPI. sdk-example.go is the file I want to edit. changelog.json contains new changes to the attached OpenAPI.yaml
+
+SDK uses OpenAPI tag and operationId fields to build SDK methods.
+
+Action: Act as software agent that for provided SDK example extending it by providing sdk method calls from changelog.json path

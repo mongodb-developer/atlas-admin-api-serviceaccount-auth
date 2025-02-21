@@ -110,4 +110,56 @@ func main() {
 
 	// 6. Remove created Service Account. We would not be able to use it afterward without access to Secret value.
 	sdk.ServiceAccountsApi.DeleteServiceAccount(ctx, sa.GetClientId(), orgID)
+
+	// 7. Examples of new User Management operations
+	
+	// 7.1 List organization users
+	orgUsers, _, err := sdk.MongoDBCloudUsersApi.ListOrganizationUsers(ctx, orgID).Execute()
+	if err != nil {
+		log.Fatalf("Error listing org users: %v", err)
+	}
+	fmt.Printf("Organization users count: %d\n", orgUsers.GetTotalCount())
+
+	// 7.2 Create a new organization user
+	newUserRoles := &admin.OrgUserRolesRequest{
+		OrgRoles: []string{"ORG_MEMBER"},
+	}
+	newUser, _, err := sdk.MongoDBCloudUsersApi.CreateOrganizationUser(ctx, orgID, 
+		&admin.CreateOrganizationRequest{
+			Username: "new.user@example.com",
+			Roles:    newUserRoles,
+		}).Execute()
+	if err != nil {
+		log.Fatalf("Error creating org user: %v", err)
+	}
+
+	// 7.3 Add project role to user
+	_, _, err = sdk.MongoDBCloudUsersApi.AddProjectRole(ctx, orgID, *newUser.Id, 
+		&admin.AddOrRemoveGroupRole{
+			Roles: []string{"GROUP_READ_ONLY"},
+		}).Execute()
+	if err != nil {
+		log.Fatalf("Error adding project role: %v", err)
+	}
+
+	// 7.4 Get project users
+	projectUsers, _, err := sdk.MongoDBCloudUsersApi.ListProjectUsers(ctx, orgID).Execute()
+	if err != nil {
+		log.Fatalf("Error listing project users: %v", err)
+	}
+	fmt.Printf("Project users count: %d\n", projectUsers.GetTotalCount())
+
+	// 7.5 Clean up - remove roles and user
+	_, _, err = sdk.MongoDBCloudUsersApi.RemoveProjectRole(ctx, orgID, *newUser.Id, 
+		&admin.AddOrRemoveGroupRole{
+			Roles: []string{"GROUP_READ_ONLY"},
+		}).Execute()
+	if err != nil {
+		log.Fatalf("Error removing project role: %v", err)
+	}
+
+	_, err = sdk.MongoDBCloudUsersApi.DeleteOrganizationUser(ctx, orgID, *newUser.Id).Execute()
+	if err != nil {
+		log.Fatalf("Error deleting org user: %v", err)
+	}
 }
